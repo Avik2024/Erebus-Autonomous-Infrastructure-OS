@@ -1,0 +1,9 @@
+/bin
+/vendor
+*.exe
+*.log
+*.tmp
+**/bin
+**/obj
+.idea
+.vscode
