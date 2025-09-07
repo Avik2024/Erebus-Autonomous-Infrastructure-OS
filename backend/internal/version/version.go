@@ -1,5 +1,12 @@
 package version
 
+import (
+	"fmt"
+	"net/http"
+)
 
-// Version of the backend service. Bump this on releases.
-var Version = "v0.0.1"
+const Version = "v0.0.1"
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, Version)
+}
