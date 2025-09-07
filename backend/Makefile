@@ -1,13 +1,13 @@
-.PHONY: build run docker
-
+.PHONY: build run test docker
 
 build:
-go build -o bin/erebus ./cmd/erebusd
-
+	go build -o bin/erebus ./cmd/erebusd
 
 run:
-go run ./cmd/erebusd
+	go run ./cmd/erebusd
 
+test:
+	go test ./...
 
 docker:
-docker build -t avik2024/erebus-backend:latest .
+	docker build -t avik2024/erebus-backend:latest .
