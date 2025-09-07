@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	//"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +11,8 @@ import (
 
 	"github.com/Avik2024/erebus/backend/internal/config"
 	"github.com/Avik2024/erebus/backend/internal/health"
+	"github.com/Avik2024/erebus/backend/internal/logging"
+	"github.com/Avik2024/erebus/backend/internal/metrics"
 	"github.com/Avik2024/erebus/backend/internal/version"
 
 	"github.com/go-chi/chi/v5"
@@ -39,13 +40,18 @@ func main() {
 
 	// Create router
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID)                   // generate request ID
+	r.Use(middleware.RealIP)                      // get real client IP
+	r.Use(middleware.Recoverer)                   // recover from panics
+	r.Use(logging.LoggerMiddleware(logger))       // structured request logging
+	r.Use(metrics.InstrumentHandler)             // Prometheus metrics
 
-	// Endpoints
+	// API Endpoints
 	r.Get("/api/healthz", health.Handler)
 	r.Get("/api/version", version.Handler)
+
+	// Metrics endpoint for Prometheus
+	metrics.RegisterMetricsEndpoint(r)
 
 	// Root endpoint
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +64,7 @@ func main() {
 		Handler: r,
 	}
 
-	// Start server in goroutine
+	// Start server in a separate goroutine
 	go func() {
 		logger.Info("starting server", zap.String("addr", srv.Addr))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
