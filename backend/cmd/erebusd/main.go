@@ -21,13 +21,17 @@ import (
 )
 
 func main() {
-	// Load config from environment
+	// ----------------------------
+	// Load configuration
+	// ----------------------------
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	// Zap logger
+	// ----------------------------
+	// Create structured logger
+	// ----------------------------
 	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalf("failed to create logger: %v", err)
@@ -38,15 +42,27 @@ func main() {
 	health.SetLogger(logger)
 	version.SetLogger(logger)
 
-	// Create router
+	// ----------------------------
+	// Initialize build info metric
+	// ----------------------------
+	metrics.InitBuildInfo(
+	version.GetVersion(),
+	version.GetCommit(),
+	version.GetDate(),
+	)
+	// ----------------------------
+	// Create router & middlewares
+	// ----------------------------
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID)                   // generate request ID
-	r.Use(middleware.RealIP)                      // get real client IP
-	r.Use(middleware.Recoverer)                   // recover from panics
-	r.Use(logging.LoggerMiddleware(logger))       // structured request logging
-	r.Use(metrics.InstrumentHandler)             // Prometheus metrics
+	r.Use(middleware.RequestID)             // generate request ID
+	r.Use(middleware.RealIP)                // get real client IP
+	r.Use(middleware.Recoverer)             // recover from panics
+	r.Use(logging.LoggerMiddleware(logger)) // structured logging
+	r.Use(metrics.InstrumentHandler)        // Prometheus metrics with request_id
 
+	// ----------------------------
 	// API Endpoints
+	// ----------------------------
 	r.Get("/api/healthz", health.Handler)
 	r.Get("/api/version", version.Handler)
 
@@ -58,13 +74,17 @@ func main() {
 		_, _ = w.Write([]byte("Erebus"))
 	})
 
+	// ----------------------------
 	// Create HTTP server
+	// ----------------------------
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
 		Handler: r,
 	}
 
-	// Start server in a separate goroutine
+	// ----------------------------
+	// Start server
+	// ----------------------------
 	go func() {
 		logger.Info("starting server", zap.String("addr", srv.Addr))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -72,7 +92,9 @@ func main() {
 		}
 	}()
 
+	// ----------------------------
 	// Graceful shutdown
+	// ----------------------------
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
