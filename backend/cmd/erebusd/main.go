@@ -28,6 +28,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
+	log.Printf("App config loaded: Env=%s, Port=%s, DB=%s, Redis Enabled=%v",
+		cfg.App.Env, cfg.App.Port, cfg.Database.URL, cfg.Redis.Enabled)
 
 	// ----------------------------
 	// Create structured logger
@@ -78,8 +80,9 @@ func main() {
 	// ----------------------------
 	// Create HTTP server
 	// ----------------------------
+	addr := ":" + cfg.App.Port
 	srv := &http.Server{
-		Addr:    ":" + cfg.App.Port, // <-- use cfg.App.Port
+		Addr:    addr,
 		Handler: r,
 	}
 

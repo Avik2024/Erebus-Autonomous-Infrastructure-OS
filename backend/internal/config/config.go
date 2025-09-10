@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -23,10 +24,10 @@ type Config struct {
 	}
 
 	Redis struct {
+		Enabled  bool
 		URL      string
 		Password string
 		DB       int
-		Enabled  bool
 	}
 
 	Security struct {
@@ -37,15 +38,22 @@ type Config struct {
 
 // Load reads configuration from .env, config.yaml, env variables, and defaults
 func Load() (*Config, error) {
-	// Load .env file if present
-	_ = godotenv.Load()
+	// ----------------------------
+	// Load .env if exists
+	// ----------------------------
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, continuing with environment variables or defaults")
+	}
 
+	// ----------------------------
 	// Setup Viper
+	// ----------------------------
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config") // support subfolder
 
+	// Automatic environment variable override
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
@@ -72,7 +80,9 @@ func Load() (*Config, error) {
 	// Read config.yaml if exists
 	// ----------------------------
 	if err := viper.ReadInConfig(); err != nil {
-		log.Printf("config file not found, using env/defaults: %v", err)
+		log.Printf("Config file not found, using env/defaults: %v", err)
+	} else {
+		log.Printf("Using config file: %s", viper.ConfigFileUsed())
 	}
 
 	// ----------------------------
@@ -80,8 +90,18 @@ func Load() (*Config, error) {
 	// ----------------------------
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to decode into struct: %w", err)
 	}
+
+	// ----------------------------
+	// Optional validation
+	// ----------------------------
+	if cfg.App.Port == "" {
+		cfg.App.Port = "8080"
+	}
+
+	log.Printf("App config loaded: Env=%s, Port=%s, DB=%s, Redis Enabled=%v",
+		cfg.App.Env, cfg.App.Port, cfg.Database.URL, cfg.Redis.Enabled)
 
 	return &cfg, nil
 }

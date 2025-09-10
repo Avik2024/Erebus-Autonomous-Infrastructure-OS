@@ -35,18 +35,17 @@ services:
       timeout: 5s
       retries: 5
 
-  # optional migration helper service (run manually with `docker compose run --rm migrate up`)
   migrate:
     image: migrate/migrate:v4.16.0
+    container_name: backend_migrate_1
     depends_on:
       - postgres
     volumes:
       - ./migrations:/migrations
     entrypoint: ["migrate"]
-    # command can be overridden when running; leave defaults empty here
-    # e.g.: docker compose run --rm migrate -path=/migrations -database "postgres://erebus:erebus_pass@postgres:5432/erebus_db?sslmode=disable" up
+    # command can be overridden when running; e.g.:
+    # docker compose run --rm migrate -path=/migrations -database "postgres://erebus:erebus@postgres:5432/erebus_db?sslmode=disable" up
 
-  # optional: your Go backend inside Docker (recommended for prod)
   backend:
     build:
       context: .
@@ -71,6 +70,8 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    volumes:
+      - ./config/config.yaml:/config/config.yaml:ro  # Mount your config.yaml
 
 volumes:
   pgdata:

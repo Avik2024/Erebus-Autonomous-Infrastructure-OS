@@ -1,0 +1,19 @@
+app:
+  name: erebus
+  env: dev
+  port: "8080"
+
+database:
+  url: "postgres://erebus:erebus@postgres:5432/erebus_db?sslmode=disable"
+  migrations: "./migrations"
+  automigrate: false
+
+redis:
+  enabled: true
+  url: "redis:6379"
+  password: ""
+  db: 0
+
+security:
+  jwtsecret: "changeme"
+  apikey: ""
