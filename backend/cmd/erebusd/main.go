@@ -46,10 +46,11 @@ func main() {
 	// Initialize build info metric
 	// ----------------------------
 	metrics.InitBuildInfo(
-	version.GetVersion(),
-	version.GetCommit(),
-	version.GetDate(),
+		version.GetVersion(),
+		version.GetCommit(),
+		version.GetDate(),
 	)
+
 	// ----------------------------
 	// Create router & middlewares
 	// ----------------------------
@@ -78,7 +79,7 @@ func main() {
 	// Create HTTP server
 	// ----------------------------
 	srv := &http.Server{
-		Addr:    ":" + cfg.Port,
+		Addr:    ":" + cfg.App.Port, // <-- use cfg.App.Port
 		Handler: r,
 	}
 
