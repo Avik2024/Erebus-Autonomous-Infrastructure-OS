@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -20,6 +21,64 @@ import (
 	"go.uber.org/zap"
 )
 
+// ----------------------------
+// Mock Controllers
+// ----------------------------
+func Register(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var body map[string]string
+	_ = json.NewDecoder(r.Body).Decode(&body)
+	resp := map[string]interface{}{
+		"message": "User registered successfully",
+		"user":    body,
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var body map[string]string
+	_ = json.NewDecoder(r.Body).Decode(&body)
+	resp := map[string]interface{}{
+		"message": "User logged in successfully",
+		"user":    body,
+		"cookie":  "mock-auth-cookie",
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
+func Profile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	resp := map[string]interface{}{
+		"name":  "Test User",
+		"email": "test@example.com",
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
+func ListProjects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projects := []map[string]interface{}{
+		{"id": 1, "title": "Project One", "description": "First project"},
+		{"id": 2, "title": "Project Two", "description": "Second project"},
+	}
+	json.NewEncoder(w).Encode(projects)
+}
+
+func CreateProject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var body map[string]string
+	_ = json.NewDecoder(r.Body).Decode(&body)
+	resp := map[string]interface{}{
+		"message": "Project created successfully",
+		"project": body,
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
+// ----------------------------
+// Main
+// ----------------------------
 func main() {
 	// ----------------------------
 	// Load configuration
@@ -68,6 +127,16 @@ func main() {
 	// ----------------------------
 	r.Get("/api/healthz", health.Handler)
 	r.Get("/api/version", version.Handler)
+
+	// ----------------------------
+	// User & Projects Endpoints
+	// ----------------------------
+	r.Post("/api/register", Register)
+	r.Post("/api/login", Login)
+	r.Get("/api/profile", Profile)
+
+	r.Get("/api/projects", ListProjects)
+	r.Post("/api/projects", CreateProject)
 
 	// Metrics endpoint for Prometheus
 	metrics.RegisterMetricsEndpoint(r)
