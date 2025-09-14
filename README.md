@@ -3,6 +3,18 @@
 Erebus is a next-generation **Autonomous Infrastructure Operating System** designed for cloudless, distributed computing.  
 It brings together concepts from **Kubernetes, Terraform, Helm, and monitoring** into a unified, self-healing platform.  
 
+Erebus is a next-generation Autonomous Infrastructure Operating System designed for cloudless, distributed computing environments. It unifies the power of modern infrastructure management by integrating concepts from Kubernetes, Terraform, Helm, and comprehensive monitoring into a single, self-healing, and intelligent platform.
+Our vision for Erebus is to revolutionize how distributed systems are managed, moving towards a truly autonomous model where infrastructure provisions, scales, and repairs itself without human intervention, ensuring unparalleled resilience and efficiency.
+
+✨ Features (Planned)
+Self-Healing Capabilities: Automatic detection and resolution of infrastructure failures.
+Autonomous Resource Allocation: Intelligent scaling and optimization of resources based on demand and predefined policies.
+Unified Control Plane: A single interface to manage compute, storage, and networking across diverse environments.
+Declarative Infrastructure as Code: Leverage familiar tools like Terraform and Helm for defining desired states.
+Real-time Observability: Integrated monitoring (Prometheus, Grafana) for deep insights into system health and performance.
+Multi-Cloud & Edge Support: Designed from the ground up to operate seamlessly across different cloud providers and edge locations.
+AI-Driven Optimization: Future integration of AI for predictive scaling, anomaly detection, and advanced self-optimization.
+
 ---
 
 ## 📂 Project Structure
@@ -68,5 +80,9 @@ Then connect and push:
 git remote add origin git@github.com:Avik2024/erebus.git
 git branch -M main
 git push -u origin main
+```
+📄 License
+Erebus is open-source and licensed under the MIT License.
+
 
 
