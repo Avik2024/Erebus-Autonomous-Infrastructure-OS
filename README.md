@@ -1,5 +1,5 @@
 # 🌌 Erebus – Autonomous Infrastructure OS
-<img src="Home/pictures/images/erebus.png" alt="Erebus Image">
+<img src="./projects/images/erebus.png" alt="Erebus Image">
 Erebus is a next-generation **Autonomous Infrastructure Operating System** designed for cloudless, distributed computing.  
 It brings together concepts from **Kubernetes, Terraform, Helm, and monitoring** into a unified, self-healing platform.  
 
